@@ -29,6 +29,7 @@ service_postinst ()
 
     # If nessecary, add user also to the old group before removing it
     syno_user_add_to_legacy_group "${EFF_USER}" "${USER}" "${LEGACY_GROUP}"
+    syno_user_add_to_legacy_group "${EFF_USER}" "${USER}" "users"
 
     # Discard legacy obsolete busybox user account
     BIN=${SYNOPKG_PKGDEST}/bin
@@ -76,6 +77,11 @@ service_postupgrade ()
         set_unix_permissions "${SYNOPKG_PKGDEST}/share"
     fi
     set_unix_permissions "${CONFIG_DIR}"
+
+    # If backup was created before new-style packages
+    # new updates/backups will fail due to permissions (see #3185)
+    set_unix_permissions "/tmp/radarr_backup"
+    set_unix_permissions "/tmp/radarr_update"
 
     # Remove upgrade Flag
     rm ${CONFIG_DIR}/KEEP_VAR
